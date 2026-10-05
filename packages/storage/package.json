@@ -1,0 +1,14 @@
+{
+  "name": "@ai-notes/storage",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ai-notes/notes": "workspace:*",
+    "idb": "^8.0.3"
+  }
+}

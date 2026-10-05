@@ -1,0 +1,23 @@
+{
+  "name": "ai-notes",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.19.0",
+  "scripts": {
+    "dev": "pnpm --filter @ai-notes/web dev",
+    "build": "pnpm --filter @ai-notes/web build",
+    "preview": "pnpm --filter @ai-notes/web preview",
+    "typecheck": "pnpm -r typecheck",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "fake-indexeddb": "^6.2.2",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}
