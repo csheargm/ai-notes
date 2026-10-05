@@ -18,6 +18,8 @@ Exit criteria: install, typecheck, test, and build pass; the local app starts; c
 
 ## Milestone 2 — Editor and Pencil
 
+Status: complete (October 5, 2026)
+
 - Rich block editor
 - Ink canvas and Pointer Events
 - Apple Pencil pressure-aware strokes
@@ -27,6 +29,8 @@ Exit criteria: install, typecheck, test, and build pass; the local app starts; c
 - iPad offline and install testing
 
 ## Milestone 3 — AI assistance
+
+Status: in progress
 
 - Backend/bridge credential boundary
 - OpenRouter and Ollama adapters

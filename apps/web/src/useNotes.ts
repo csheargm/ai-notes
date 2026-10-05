@@ -3,6 +3,8 @@ import {
   sortNotes,
   updateNote,
   updateNoteText,
+  updateNoteInk,
+  type InkStroke,
   type Note,
 } from "@ai-notes/notes";
 import { IndexedDbNoteRepository } from "@ai-notes/storage";
@@ -122,6 +124,14 @@ export function useNotes() {
     (note: Note) => replace(updateNote(note, { pinned: !note.pinned }), true),
     [replace],
   );
+  const setInk = useCallback(
+    (
+      note: Note,
+      strokes: InkStroke[],
+      size: { width: number; height: number },
+    ) => replace(updateNoteInk(note, strokes, size)),
+    [replace],
+  );
 
   return {
     notes,
@@ -135,5 +145,6 @@ export function useNotes() {
     editText,
     setTags,
     togglePin,
+    setInk,
   };
 }

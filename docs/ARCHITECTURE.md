@@ -31,7 +31,7 @@ Package dependencies point inward: the application may depend on packages, stora
 
 ## Domain model
 
-The note aggregate contains metadata and an ordered list of versioned content blocks. Milestone 1 uses a text block while retaining a discriminated block shape.
+The note aggregate contains metadata and an ordered list of versioned content blocks. Text and ink blocks now coexist in the same note; later source and attachment blocks extend the same discriminated union.
 
 ```ts
 type Note = {
@@ -47,6 +47,10 @@ type Note = {
 ```
 
 Domain functions normalize tags, create notes, update text, and apply metadata changes. They are pure and covered by unit tests.
+
+### Ink input
+
+The web editor captures Pointer Events into vector strokes containing coordinates, pressure, and timestamps. The SVG surface renders pen and highlighter strokes, supports stroke erasure, and maintains bounded undo/redo history. Large touch contacts are ignored as a best-effort palm rejection heuristic. IndexedDB stores the canonical vectors as an ink block alongside typed text.
 
 ## Persistence
 

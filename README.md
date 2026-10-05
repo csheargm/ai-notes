@@ -7,6 +7,8 @@ AI Notes is a local-first notebook and knowledge workspace designed for fast wri
 - Create, edit, and delete notes
 - Search titles, note text, and tags
 - Add tags and pin important notes
+- Draw persistent vector ink with mouse, touch, or Apple Pencil
+- Use pressure-aware pen, highlighter, eraser, and ink undo/redo
 - IndexedDB persistence with optimistic editing
 - Responsive, installable PWA shell
 - AI provider and routing contracts with no fake integrations

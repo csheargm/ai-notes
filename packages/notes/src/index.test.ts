@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
   createNote,
+  inkBlock,
   matchesNote,
   normalizeTags,
   noteText,
   sortNotes,
   updateNoteText,
+  updateNoteInk,
 } from "./index";
 
 describe("note domain", () => {
@@ -64,5 +66,24 @@ describe("note domain", () => {
     expect(sortNotes([older, { ...newer, pinned: true }])[0]?.pinned).toBe(
       true,
     );
+  });
+
+  it("stores vector ink without changing searchable text", () => {
+    const note = createNote({ text: "Typed context" });
+    const updated = updateNoteInk(
+      note,
+      [
+        {
+          id: "stroke-1",
+          tool: "pen",
+          color: "#222",
+          width: 3,
+          points: [{ x: 1, y: 2, pressure: 0.7, timestamp: 10 }],
+        },
+      ],
+      { width: 640, height: 320 },
+    );
+    expect(inkBlock(updated)?.strokes[0]?.points[0]?.pressure).toBe(0.7);
+    expect(noteText(updated)).toBe("Typed context");
   });
 });

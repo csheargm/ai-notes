@@ -6,7 +6,32 @@ export type TextBlock = {
   text: string;
 };
 
-export type NoteBlock = TextBlock;
+export type InkTool = "pen" | "highlighter" | "eraser";
+
+export type InkPoint = {
+  x: number;
+  y: number;
+  pressure: number;
+  timestamp: number;
+};
+
+export type InkStroke = {
+  id: string;
+  tool: Exclude<InkTool, "eraser">;
+  color: string;
+  width: number;
+  points: InkPoint[];
+};
+
+export type InkBlock = {
+  id: string;
+  type: "ink";
+  width: number;
+  height: number;
+  strokes: InkStroke[];
+};
+
+export type NoteBlock = TextBlock | InkBlock;
 
 export type Note = {
   id: string;
@@ -50,7 +75,10 @@ export function createNote(
 }
 
 export function noteText(note: Note): string {
-  return note.blocks.map((block) => block.text).join("\n\n");
+  return note.blocks
+    .filter((block): block is TextBlock => block.type === "text")
+    .map((block) => block.text)
+    .join("\n\n");
 }
 
 export function updateNote(
@@ -79,6 +107,30 @@ export function updateNoteText(
         block.id === firstText.id ? { ...block, text } : block,
       )
     : [{ id: createId("block"), type: "text", text }];
+  return updateNote(note, { blocks }, timestamp);
+}
+
+export function inkBlock(note: Note): InkBlock | undefined {
+  return note.blocks.find((block): block is InkBlock => block.type === "ink");
+}
+
+export function updateNoteInk(
+  note: Note,
+  strokes: InkStroke[],
+  size: { width: number; height: number },
+  timestamp = nowIso(),
+): Note {
+  const current = inkBlock(note);
+  const next: InkBlock = {
+    id: current?.id ?? createId("block"),
+    type: "ink",
+    width: size.width,
+    height: size.height,
+    strokes,
+  };
+  const blocks = current
+    ? note.blocks.map((block) => (block.id === current.id ? next : block))
+    : [...note.blocks, next];
   return updateNote(note, { blocks }, timestamp);
 }
 

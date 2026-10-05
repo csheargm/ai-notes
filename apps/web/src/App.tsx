@@ -1,4 +1,10 @@
-import { matchesNote, noteText, type Note } from "@ai-notes/notes";
+import {
+  inkBlock,
+  matchesNote,
+  noteText,
+  type InkStroke,
+  type Note,
+} from "@ai-notes/notes";
 import {
   Archive,
   ChevronLeft,
@@ -17,6 +23,7 @@ import {
 } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { useNotes } from "./useNotes";
+import { InkCanvas } from "./InkCanvas";
 
 type Filter = "all" | "pinned";
 
@@ -48,6 +55,7 @@ function NoteEditor({
   onPin,
   onDelete,
   onBack,
+  onInk,
 }: {
   note: Note;
   onTitle: (value: string) => void;
@@ -56,6 +64,10 @@ function NoteEditor({
   onPin: () => void;
   onDelete: () => void;
   onBack: () => void;
+  onInk: (
+    strokes: InkStroke[],
+    size: { width: number; height: number },
+  ) => void;
 }) {
   const [tagDraft, setTagDraft] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -175,6 +187,7 @@ function NoteEditor({
           placeholder="Start writing…"
           spellCheck
         />
+        <InkCanvas strokes={inkBlock(note)?.strokes ?? []} onChange={onInk} />
       </article>
     </main>
   );
@@ -364,6 +377,7 @@ export function App() {
           onPin={() => notebook.togglePin(selected)}
           onDelete={remove}
           onBack={() => setMobileEditor(false)}
+          onInk={(strokes, size) => notebook.setInk(selected, strokes, size)}
         />
       ) : (
         <main className="editor-shell editor-empty">
