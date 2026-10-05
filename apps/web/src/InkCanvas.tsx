@@ -3,6 +3,7 @@ import {
   Eraser,
   Highlighter,
   Pen,
+  MousePointer2,
   Redo2,
   RotateCcw,
   Trash2,
@@ -53,6 +54,7 @@ function hits(stroke: InkStroke, target: InkPoint): boolean {
 export function InkCanvas({ strokes, onChange }: Props) {
   const [tool, setTool] = useState<InkTool>("pen");
   const [draft, setDraft] = useState<InkStroke>();
+  const [selectedId, setSelectedId] = useState<string>();
   const [history, setHistory] = useState<InkStroke[][]>([]);
   const [future, setFuture] = useState<InkStroke[][]>([]);
   const strokesRef = useRef(strokes);
@@ -91,6 +93,14 @@ export function InkCanvas({ strokes, onChange }: Props) {
       return;
     event.currentTarget.setPointerCapture(event.pointerId);
     const nextPoint = point(event);
+    if (tool === "select") {
+      setSelectedId(
+        [...strokesRef.current]
+          .reverse()
+          .find((stroke) => hits(stroke, nextPoint))?.id,
+      );
+      return;
+    }
     if (tool === "eraser") {
       const next = strokesRef.current.filter(
         (stroke) => !hits(stroke, nextPoint),
@@ -161,6 +171,13 @@ export function InkCanvas({ strokes, onChange }: Props) {
           >
             <Eraser size={16} />
           </button>
+          <button
+            className={tool === "select" ? "active" : ""}
+            onClick={() => setTool("select")}
+            aria-label="Select stroke"
+          >
+            <MousePointer2 size={16} />
+          </button>
           <span className="tool-divider" />
           <button
             disabled={!history.length}
@@ -177,9 +194,18 @@ export function InkCanvas({ strokes, onChange }: Props) {
             <Redo2 size={16} />
           </button>
           <button
-            disabled={!strokes.length}
-            onClick={() => commit([])}
-            aria-label="Clear ink"
+            disabled={!selectedId && !strokes.length}
+            onClick={() => {
+              if (selectedId) {
+                commit(
+                  strokesRef.current.filter(
+                    (stroke) => stroke.id !== selectedId,
+                  ),
+                );
+                setSelectedId(undefined);
+              } else commit([]);
+            }}
+            aria-label={selectedId ? "Delete selected stroke" : "Clear ink"}
           >
             <Trash2 size={16} />
           </button>
@@ -223,6 +249,11 @@ export function InkCanvas({ strokes, onChange }: Props) {
             strokeLinecap="round"
             strokeLinejoin="round"
             opacity={stroke.tool === "highlighter" ? 0.48 : 1}
+            style={
+              stroke.id === selectedId
+                ? { filter: "drop-shadow(0 0 5px #4b7b70)" }
+                : undefined
+            }
           />
         ))}
       </svg>

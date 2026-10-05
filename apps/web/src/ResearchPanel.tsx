@@ -245,6 +245,36 @@ export function ResearchPanel({
     }
   };
 
+  const openAttachment = async (source: SourceBlock) => {
+    if (!source.attachmentId) return;
+    let attachment = await attachments.get(source.attachmentId);
+    if (!attachment) {
+      const baseUrl = localStorage
+        .getItem("ai-notes-sync-url")
+        ?.replace(/\/$/, "");
+      const token = sessionStorage.getItem("ai-notes-sync-token");
+      if (!baseUrl || !token) return;
+      const response = await fetch(
+        `${baseUrl}/api/attachments/${source.attachmentId}`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      if (!response.ok) return;
+      attachment = await attachments.saveBlob(
+        source.attachmentId,
+        await response.blob(),
+        source.title,
+        source.mimeType,
+      );
+    }
+    const objectUrl = URL.createObjectURL(attachment.blob);
+    const anchor = document.createElement("a");
+    anchor.href = objectUrl;
+    anchor.target = "_blank";
+    anchor.rel = "noopener";
+    anchor.click();
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
+  };
+
   return (
     <aside className="research-panel" aria-label="Research workspace">
       <header>
@@ -297,6 +327,14 @@ export function ResearchPanel({
               <a href={source.url} target="_blank" rel="noreferrer">
                 Open source
               </a>
+            )}
+            {source.attachmentId && (
+              <button
+                className="open-attachment"
+                onClick={() => void openAttachment(source)}
+              >
+                Open attachment
+              </button>
             )}
             {source.extractedText && (
               <details>

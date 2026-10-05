@@ -1,4 +1,5 @@
-import type { Note } from "@ai-notes/notes";
+import { sources, type Note } from "@ai-notes/notes";
+import { IndexedDbAttachmentRepository } from "@ai-notes/storage";
 import { SyncClient, type SyncChange } from "@ai-notes/sync";
 import { Cloud, RefreshCw, ShieldCheck, X } from "lucide-react";
 import { useState } from "react";
@@ -6,6 +7,7 @@ import { useState } from "react";
 const deviceId =
   localStorage.getItem("ai-notes-device-id") ?? crypto.randomUUID();
 localStorage.setItem("ai-notes-device-id", deviceId);
+const attachmentRepository = new IndexedDbAttachmentRepository();
 
 export function SyncPanel({
   notes,
@@ -36,6 +38,44 @@ export function SyncPanel({
     try {
       localStorage.setItem("ai-notes-sync-url", baseUrl);
       sessionStorage.setItem("ai-notes-sync-token", token);
+      const uploaded = new Set(
+        JSON.parse(
+          localStorage.getItem("ai-notes-uploaded-attachments") ?? "[]",
+        ) as string[],
+      );
+      for (const source of notes.flatMap(sources)) {
+        if (!source.attachmentId || uploaded.has(source.attachmentId)) continue;
+        const attachment = await attachmentRepository.get(source.attachmentId);
+        if (!attachment) continue;
+        const bytes = new Uint8Array(await attachment.blob.arrayBuffer());
+        let binary = "";
+        for (let offset = 0; offset < bytes.length; offset += 0x8000)
+          binary += String.fromCharCode(
+            ...bytes.subarray(offset, offset + 0x8000),
+          );
+        const upload = await fetch(
+          `${baseUrl.replace(/\/$/, "")}/api/attachments/${source.attachmentId}`,
+          {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              data: btoa(binary),
+              contentType: attachment.mimeType,
+              name: attachment.name,
+            }),
+          },
+        );
+        if (!upload.ok)
+          throw new Error(`Could not upload attachment ${attachment.name}.`);
+        uploaded.add(source.attachmentId);
+      }
+      localStorage.setItem(
+        "ai-notes-uploaded-attachments",
+        JSON.stringify([...uploaded]),
+      );
       const cursor = Number(localStorage.getItem("ai-notes-sync-cursor") ?? 0);
       const revisions = JSON.parse(
         localStorage.getItem("ai-notes-sync-revisions") ?? "{}",

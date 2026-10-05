@@ -35,6 +35,8 @@ export interface AIProvider {
   readonly capabilities: AICapabilities;
   isAvailable(): Promise<boolean>;
   complete(request: AIRequest): Promise<AIResponse>;
+  stream?(request: AIRequest): AsyncIterable<string>;
+  modelId?(request: AIRequest): string | undefined;
 }
 
 export class AIRouter {
@@ -59,5 +61,27 @@ export class AIRouter {
         `No available AI provider supports ${request.task} with the ${request.profile} profile.`,
       );
     return provider.complete(request);
+  }
+
+  async *stream(
+    request: AIRequest,
+  ): AsyncIterable<{ value: string; providerId: string; model?: string }> {
+    const provider = await this.select(request);
+    if (!provider)
+      throw new Error(
+        `No available AI provider supports ${request.task} with the ${request.profile} profile.`,
+      );
+    if (provider.stream) {
+      for await (const value of provider.stream(request))
+        yield {
+          value,
+          providerId: provider.id,
+          model: provider.modelId?.(request),
+        };
+      return;
+    }
+    const result = await provider.complete(request);
+    for (const value of result.content.match(/\S+\s*/g) ?? [])
+      yield { value, providerId: result.providerId, model: result.model };
   }
 }

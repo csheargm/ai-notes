@@ -8,7 +8,11 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { loadEnvFile } from "node:process";
 import { AIRouter, type AIRequest } from "@ai-notes/ai";
-import { OllamaProvider, OpenRouterProvider } from "./providers.js";
+import {
+  MLXProvider,
+  OllamaProvider,
+  OpenRouterProvider,
+} from "./providers.js";
 import { FileSyncStore } from "./sync-store.js";
 import { AgentService, cliRunner } from "./agent-service.js";
 
@@ -56,7 +60,8 @@ const ollama = new OllamaProvider(
   process.env.OLLAMA_BASE_URL,
   process.env.OLLAMA_MODEL,
 );
-const router = new AIRouter([ollama, openRouter]);
+const mlx = new MLXProvider(process.env.MLX_BASE_URL, process.env.MLX_MODEL);
+const router = new AIRouter([ollama, mlx, openRouter]);
 
 function json(response: ServerResponse, status: number, body: unknown) {
   response.writeHead(status, {
@@ -97,13 +102,19 @@ const server = createServer(async (request, response) => {
   response.setHeader("Referrer-Policy", "no-referrer");
 
   if (request.method === "GET" && request.url === "/api/health") {
-    const [ollamaAvailable, openRouterAvailable] = await Promise.all([
-      ollama.isAvailable(),
-      openRouter.isAvailable(),
-    ]);
+    const [ollamaAvailable, mlxAvailable, openRouterAvailable] =
+      await Promise.all([
+        ollama.isAvailable(),
+        mlx.isAvailable(),
+        openRouter.isAvailable(),
+      ]);
     return json(response, 200, {
       ok: true,
-      providers: { ollama: ollamaAvailable, openrouter: openRouterAvailable },
+      providers: {
+        ollama: ollamaAvailable,
+        mlx: mlxAvailable,
+        openrouter: openRouterAvailable,
+      },
     });
   }
 
@@ -114,20 +125,28 @@ const server = createServer(async (request, response) => {
         return json(response, 400, {
           error: "task, profile, and input are required",
         });
-      const result = await router.complete(payload);
       response.writeHead(200, {
         "Content-Type": "application/x-ndjson",
         "Cache-Control": "no-store",
       });
-      for (const token of result.content.match(/\S+\s*/g) ?? [])
-        response.write(`${JSON.stringify({ type: "delta", value: token })}\n`);
+      let providerId = "";
+      let model: string | undefined;
+      for await (const event of router.stream(payload)) {
+        providerId = event.providerId;
+        model = event.model ?? model;
+        response.write(
+          `${JSON.stringify({ type: "delta", value: event.value })}\n`,
+        );
+      }
       response.end(
-        `${JSON.stringify({ type: "done", providerId: result.providerId, model: result.model, sources: result.sources ?? [] })}\n`,
+        `${JSON.stringify({ type: "done", providerId, model, sources: payload.context?.map((item) => item.sourceId) ?? [] })}\n`,
       );
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "AI request failed.";
-      json(response, 503, { error: message });
+      if (response.headersSent)
+        response.end(`${JSON.stringify({ type: "error", error: message })}\n`);
+      else json(response, 503, { error: message });
     }
     return;
   }

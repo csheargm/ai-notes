@@ -11,7 +11,7 @@ AI Notes is a local-first notebook and knowledge workspace designed for fast wri
 - Use pressure-aware pen, highlighter, eraser, and ink undo/redo
 - IndexedDB persistence with optimistic editing
 - Responsive, installable PWA shell
-- Secure OpenRouter and Ollama note actions through a local server gateway
+- Secure OpenRouter, Ollama, and MLX note actions through a local server gateway
 - Authenticated multi-device synchronization with change feeds, conflicts, and history
 - Separate authenticated attachment storage
 - URL, PDF, image, audio, and file research capture
@@ -32,13 +32,15 @@ pnpm dev
 
 The development server prints its local URL, normally `http://localhost:5173`.
 
-`pnpm dev` starts both the web app and the local API gateway. For local AI, install an Ollama model and set `OLLAMA_MODEL` in `.env`. For cloud AI, copy `.env.example` to `.env` and set `OPENROUTER_API_KEY`. Secrets remain in the server process and are never bundled into the browser app.
+`pnpm dev` starts both the web app and the local API gateway. For local AI, install an Ollama model and set `OLLAMA_MODEL`, or run an OpenAI-compatible MLX server and set `MLX_BASE_URL` and `MLX_MODEL` in `.env`. Ollama is preferred when both local providers are available. For cloud AI, copy `.env.example` to `.env` and set `OPENROUTER_API_KEY`. Secrets remain in the server process and are never bundled into the browser app.
 
 Available note actions are summarize, explain, rewrite, action items, tag suggestions, and question answering. Routing profiles select Default, Fast, Deep, Local, or the future permissioned Agent path.
 
 To enable synchronization, set a long random `AI_NOTES_SYNC_TOKEN` in `.env`, run the server, then open **Sync notebook** in the app and enter the server URL and token. The browser keeps the token only in session storage. The server persists notes, version history, and attachments below `AI_NOTES_DATA_DIR` (default `.data`). Deploy the server behind HTTPS for use across devices.
 
 Trusted agents are disabled by default. Set `AI_NOTES_ENABLE_CODEX=true` and/or `AI_NOTES_ENABLE_CLAUDE=true`, plus `AI_NOTES_AGENT_WORKSPACE`, only on a machine where those CLIs are already authenticated. The app always shows the prompt preview and requested permissions before the separate **Approve and run** action. Agent output is a proposal and never edits a note automatically; audit events are stored under `.data/audit`.
+
+For private access from other devices, follow the [deployment guide](docs/DEPLOYMENT.md). The recommended personal setup uses Tailscale Serve and keeps Funnel disabled.
 
 ## Validation
 

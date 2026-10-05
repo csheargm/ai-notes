@@ -741,6 +741,14 @@ textarea:focus-visible {
   cursor: default;
   opacity: 0.32;
 }
+
+.ink-canvas.tool-select {
+  cursor: default;
+}
+
+.open-attachment {
+  margin-top: 0.55rem;
+}
 .tool-divider {
   width: 1px;
   height: 19px;

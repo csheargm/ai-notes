@@ -6,7 +6,7 @@ export type TextBlock = {
   text: string;
 };
 
-export type InkTool = "pen" | "highlighter" | "eraser";
+export type InkTool = "pen" | "highlighter" | "eraser" | "select";
 
 export type InkPoint = {
   x: number;

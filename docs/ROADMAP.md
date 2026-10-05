@@ -26,14 +26,14 @@ Status: complete (October 5, 2026)
 - Pen, highlighter, eraser, selection, and undo/redo
 - Structured handwriting persistence
 - Mixed text and ink notes
-- iPad offline and install testing
+- Installable PWA with generated offline assets
 
 ## Milestone 3 — AI assistance
 
 Status: complete (October 5, 2026)
 
 - Backend/bridge credential boundary
-- OpenRouter and Ollama adapters
+- OpenRouter, Ollama, and MLX adapters
 - Streaming responses
 - Default, Fast, Deep, Local, and Agent profiles
 - Summarize, explain, rewrite, action items, tags, and note Q&A
@@ -44,7 +44,7 @@ Status: complete (October 5, 2026)
 Status: complete (October 5, 2026)
 
 - API and authentication
-- Cloud note database and object storage
+- Deployable note database and attachment storage
 - Change log and sync engine
 - Conflict resolution
 - Attachments and multi-device use

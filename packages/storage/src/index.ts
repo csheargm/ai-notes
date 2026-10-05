@@ -91,12 +91,25 @@ export class IndexedDbAttachmentRepository {
     return this.database;
   }
   async save(file: File) {
+    return this.saveBlob(
+      crypto.randomUUID(),
+      file.slice(),
+      file.name,
+      file.type || "application/octet-stream",
+    );
+  }
+  async saveBlob(
+    id: string,
+    blob: Blob,
+    name: string,
+    mimeType = blob.type || "application/octet-stream",
+  ) {
     const value = {
-      id: crypto.randomUUID(),
-      blob: file.slice(),
-      name: file.name,
-      mimeType: file.type || "application/octet-stream",
-      size: file.size,
+      id,
+      blob,
+      name,
+      mimeType,
+      size: blob.size,
       createdAt: new Date().toISOString(),
     };
     await (await this.db()).put("attachments", value);
@@ -107,5 +120,10 @@ export class IndexedDbAttachmentRepository {
   }
   async delete(id: string) {
     await (await this.db()).delete("attachments", id);
+  }
+  async close(): Promise<void> {
+    if (!this.database) return;
+    (await this.database).close();
+    this.database = undefined;
   }
 }
