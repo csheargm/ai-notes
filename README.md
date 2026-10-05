@@ -11,7 +11,7 @@ AI Notes is a local-first notebook and knowledge workspace designed for fast wri
 - Use pressure-aware pen, highlighter, eraser, and ink undo/redo
 - IndexedDB persistence with optimistic editing
 - Responsive, installable PWA shell
-- AI provider and routing contracts with no fake integrations
+- Secure OpenRouter and Ollama note actions through a local server gateway
 
 See [requirements](docs/REQUIREMENTS.md), [architecture](docs/ARCHITECTURE.md), and [roadmap](docs/ROADMAP.md) for the product direction and current scope.
 
@@ -26,6 +26,10 @@ pnpm dev
 
 The development server prints its local URL, normally `http://localhost:5173`.
 
+`pnpm dev` starts both the web app and the local API gateway. For local AI, install an Ollama model and set `OLLAMA_MODEL` in `.env`. For cloud AI, copy `.env.example` to `.env` and set `OPENROUTER_API_KEY`. Secrets remain in the server process and are never bundled into the browser app.
+
+Available note actions are summarize, explain, rewrite, action items, tag suggestions, and question answering. Routing profiles select Default, Fast, Deep, Local, or the future permissioned Agent path.
+
 ## Validation
 
 ```bash
@@ -37,6 +41,7 @@ pnpm build
 ## Workspace
 
 - `apps/web` — React application and PWA composition root
+- `apps/server` — local credential boundary and AI gateway
 - `packages/notes` — note domain model and pure behavior
 - `packages/storage` — persistence contracts and IndexedDB adapter
 - `packages/ai` — provider-neutral AI contracts and routing policy
@@ -44,4 +49,4 @@ pnpm build
 
 ## Privacy and AI
 
-Milestone 1 does not send note content to an AI service. Future cloud integrations will keep secrets outside the browser bundle. Local CLIs such as Codex or Claude must run behind an explicit trusted bridge and cannot be executed directly by browser code.
+AI actions send the current note to the provider selected by the user. Cloud credentials stay in the local gateway environment; they are never exposed to the browser bundle. Local CLIs such as Codex or Claude require the explicit trusted bridge and audit controls planned for Milestone 6.

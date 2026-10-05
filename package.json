@@ -4,8 +4,8 @@
   "private": true,
   "packageManager": "pnpm@11.19.0",
   "scripts": {
-    "dev": "pnpm --filter @ai-notes/web dev",
-    "build": "pnpm --filter @ai-notes/web build",
+    "dev": "pnpm --parallel --filter @ai-notes/server --filter @ai-notes/web dev",
+    "build": "pnpm --filter @ai-notes/server build && pnpm --filter @ai-notes/web build",
     "preview": "pnpm --filter @ai-notes/web preview",
     "typecheck": "pnpm -r typecheck",
     "test": "vitest run",

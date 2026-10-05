@@ -76,7 +76,9 @@ Vite builds static assets. The PWA plugin generates a manifest and service worke
 
 `AIProvider` exposes identity, capabilities, availability, and completion. `AIRouter` selects an eligible provider based on task and routing profile. Profiles express intent instead of forcing a model choice for each action.
 
-No functional provider ships in Milestone 1. Browser code must never invoke Codex CLI or Claude CLI. Cloud keys must later be held by a backend or another protected execution boundary.
+The local Node gateway implements OpenRouter and Ollama adapters. Browser code sends note actions to `/api/ai`; cloud keys remain in server environment variables and never enter the client bundle. Responses use newline-delimited JSON so the UI can render incremental output and display provider/model provenance. Browser code never invokes Codex CLI or Claude CLI; those remain behind the later trusted-agent boundary.
+
+OpenRouter supports Default, Fast, and Deep routing profiles with configurable model IDs. Ollama supports the Local profile and reports available only when its configured model is installed. Agent routing remains intentionally unavailable until Milestone 6 adds explicit permissions and auditing.
 
 ## Sync direction
 

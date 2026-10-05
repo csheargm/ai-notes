@@ -30,7 +30,7 @@ Status: complete (October 5, 2026)
 
 ## Milestone 3 — AI assistance
 
-Status: in progress
+Status: complete (October 5, 2026)
 
 - Backend/bridge credential boundary
 - OpenRouter and Ollama adapters
@@ -40,6 +40,8 @@ Status: in progress
 - Provenance for generated content
 
 ## Milestone 4 — Synchronization
+
+Status: in progress
 
 - API and authentication
 - Cloud note database and object storage
