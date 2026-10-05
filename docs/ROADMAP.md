@@ -2,7 +2,7 @@
 
 ## Milestone 1 — Foundation
 
-Status: in progress
+Status: complete (October 5, 2026)
 
 - TypeScript/pnpm workspace
 - Responsive React notebook shell
