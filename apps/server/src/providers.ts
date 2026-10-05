@@ -157,7 +157,7 @@ export class OllamaProvider implements AIProvider {
 
   constructor(
     private readonly baseUrl = "http://127.0.0.1:11434",
-    private readonly model = "llama3.2",
+    private readonly model = "llama3.2:3b",
     private readonly fetcher: Fetch = fetch,
   ) {}
 
@@ -177,7 +177,7 @@ export class OllamaProvider implements AIProvider {
       return Boolean(
         data.models?.some((item) => {
           const name = item.model ?? item.name ?? "";
-          return name === this.model || name.startsWith(`${this.model}:`);
+          return name === this.model;
         }),
       );
     } catch {

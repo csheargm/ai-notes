@@ -29,7 +29,7 @@ export function AIPanel({
   note: Note;
   onClose: () => void;
 }) {
-  const [profile, setProfile] = useState<AIProfile>("default");
+  const [profile, setProfile] = useState<AIProfile>("local");
   const [task, setTask] = useState<AITask>("summarize");
   const [question, setQuestion] = useState("");
   const [result, setResult] = useState("");
@@ -78,6 +78,7 @@ export function AIPanel({
             value?: string;
             providerId?: string;
             model?: string;
+            error?: string;
           };
           if (event.type === "delta")
             setResult((current) => current + (event.value ?? ""));
@@ -85,6 +86,8 @@ export function AIPanel({
             setProvenance(
               [event.providerId, event.model].filter(Boolean).join(" · "),
             );
+          if (event.type === "error")
+            throw new Error(event.error ?? "AI request failed.");
         }
         if (done) break;
       }
