@@ -1,6 +1,6 @@
 # AI Notes
 
-AI Notes is a local-first notebook and knowledge workspace designed for fast writing, iPad use, research, and provider-neutral AI assistance. Milestone 1 is a focused offline-capable text notebook with durable browser storage.
+AI Notes is a local-first notebook and knowledge workspace designed for fast writing, iPad use, research, synchronization, and provider-neutral AI assistance.
 
 ## What works
 
@@ -14,6 +14,9 @@ AI Notes is a local-first notebook and knowledge workspace designed for fast wri
 - Secure OpenRouter and Ollama note actions through a local server gateway
 - Authenticated multi-device synchronization with change feeds, conflicts, and history
 - Separate authenticated attachment storage
+- URL, PDF, image, audio, and file research capture
+- PDF text extraction, image OCR, annotations, links, backlinks, and related notes
+- Draggable spatial research board
 
 See [requirements](docs/REQUIREMENTS.md), [architecture](docs/ARCHITECTURE.md), and [roadmap](docs/ROADMAP.md) for the product direction and current scope.
 
@@ -50,6 +53,7 @@ pnpm build
 - `packages/storage` — persistence contracts and IndexedDB adapter
 - `packages/ai` — provider-neutral AI contracts and routing policy
 - `packages/sync` — change-feed contracts, client, and conflict policy
+- `packages/research` — backlinks and offline related-note ranking
 - `packages/shared` — shared primitives
 
 ## Privacy and AI

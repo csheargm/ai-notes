@@ -95,6 +95,12 @@ The browser tracks a per-device cursor, last-synced revisions, and pending delet
 
 Attachment metadata belongs in note blocks; binary data belongs in a separate blob/object store. The server exposes authenticated, size-limited attachment upload/download endpoints and stores binary data separately from notes. A deployed instance can replace the filesystem adapter with object storage without changing note records.
 
+## Research workspace
+
+Research sources are typed note blocks for URLs, PDFs, images, audio, and files. Browser binaries live in a separate IndexedDB object store; source blocks retain metadata, extracted text, and annotations. PDF.js extracts PDF text, while native text detection or Tesseract provides image OCR. Links between notes produce backlinks without a separate graph database.
+
+Local discovery builds lightweight term vectors from titles, text, tags, source extraction, and annotations, with small concept expansions for offline related-note ranking. The spatial board stores positioned source/note cards in a canvas block, keeping the layout portable with the note.
+
 ## Security boundaries
 
 - Client bundle: UI, local database, routing policy, non-secret configuration.

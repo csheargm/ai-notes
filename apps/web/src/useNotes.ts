@@ -1,9 +1,15 @@
 import {
   createNote,
+  addReference,
+  addSource,
   sortNotes,
   updateNote,
   updateNoteText,
   updateNoteInk,
+  updateSource,
+  updateCanvas,
+  type CanvasItem,
+  type SourceBlock,
   type InkStroke,
   type Note,
 } from "@ai-notes/notes";
@@ -172,6 +178,29 @@ export function useNotes() {
     ) => replace(updateNoteInk(note, strokes, size)),
     [replace],
   );
+  const createSource = useCallback(
+    (note: Note, source: Omit<SourceBlock, "id" | "type" | "createdAt">) =>
+      replace(addSource(note, source), true),
+    [replace],
+  );
+  const editSource = useCallback(
+    (
+      note: Note,
+      sourceId: string,
+      changes: Partial<Omit<SourceBlock, "id" | "type">>,
+    ) => replace(updateSource(note, sourceId, changes), true),
+    [replace],
+  );
+  const linkNote = useCallback(
+    (note: Note, targetId: string, label: string) =>
+      replace(addReference(note, targetId, label), true),
+    [replace],
+  );
+  const setCanvas = useCallback(
+    (note: Note, items: CanvasItem[]) =>
+      replace(updateCanvas(note, items), true),
+    [replace],
+  );
 
   return {
     notes,
@@ -186,6 +215,10 @@ export function useNotes() {
     setTags,
     togglePin,
     setInk,
+    createSource,
+    editSource,
+    linkNote,
+    setCanvas,
     deletedIds,
     applySyncChanges,
     markDeletionsSynced,

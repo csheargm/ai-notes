@@ -31,7 +31,49 @@ export type InkBlock = {
   strokes: InkStroke[];
 };
 
-export type NoteBlock = TextBlock | InkBlock;
+export type SourceKind = "url" | "pdf" | "image" | "audio" | "file";
+
+export type SourceBlock = {
+  id: string;
+  type: "source";
+  kind: SourceKind;
+  title: string;
+  url?: string;
+  attachmentId?: string;
+  mimeType?: string;
+  size?: number;
+  extractedText?: string;
+  annotations: string[];
+  createdAt: ISODateString;
+};
+
+export type ReferenceBlock = {
+  id: string;
+  type: "reference";
+  noteId: string;
+  label: string;
+};
+
+export type CanvasItem = {
+  id: string;
+  label: string;
+  x: number;
+  y: number;
+  color: string;
+  sourceBlockId?: string;
+  noteId?: string;
+};
+
+export type CanvasBlock = {
+  id: string;
+  type: "canvas";
+  width: number;
+  height: number;
+  items: CanvasItem[];
+};
+
+export type NoteBlock =
+  TextBlock | InkBlock | SourceBlock | ReferenceBlock | CanvasBlock;
 
 export type Note = {
   id: string;
@@ -132,6 +174,109 @@ export function updateNoteInk(
     ? note.blocks.map((block) => (block.id === current.id ? next : block))
     : [...note.blocks, next];
   return updateNote(note, { blocks }, timestamp);
+}
+
+export function addSource(
+  note: Note,
+  source: Omit<SourceBlock, "id" | "type" | "createdAt">,
+  timestamp = nowIso(),
+): Note {
+  return updateNote(
+    note,
+    {
+      blocks: [
+        ...note.blocks,
+        {
+          ...source,
+          id: createId("source"),
+          type: "source",
+          createdAt: timestamp,
+        },
+      ],
+    },
+    timestamp,
+  );
+}
+
+export function updateSource(
+  note: Note,
+  sourceId: string,
+  changes: Partial<Omit<SourceBlock, "id" | "type">>,
+  timestamp = nowIso(),
+): Note {
+  return updateNote(
+    note,
+    {
+      blocks: note.blocks.map((block) =>
+        block.id === sourceId && block.type === "source"
+          ? { ...block, ...changes }
+          : block,
+      ),
+    },
+    timestamp,
+  );
+}
+
+export function addReference(
+  note: Note,
+  noteId: string,
+  label: string,
+  timestamp = nowIso(),
+): Note {
+  if (
+    note.blocks.some(
+      (block) => block.type === "reference" && block.noteId === noteId,
+    )
+  )
+    return note;
+  return updateNote(
+    note,
+    {
+      blocks: [
+        ...note.blocks,
+        { id: createId("reference"), type: "reference", noteId, label },
+      ],
+    },
+    timestamp,
+  );
+}
+
+export function sources(note: Note): SourceBlock[] {
+  return note.blocks.filter(
+    (block): block is SourceBlock => block.type === "source",
+  );
+}
+
+export function references(note: Note): ReferenceBlock[] {
+  return note.blocks.filter(
+    (block): block is ReferenceBlock => block.type === "reference",
+  );
+}
+
+export function updateCanvas(
+  note: Note,
+  items: CanvasItem[],
+  timestamp = nowIso(),
+): Note {
+  const current = note.blocks.find(
+    (block): block is CanvasBlock => block.type === "canvas",
+  );
+  const next: CanvasBlock = {
+    id: current?.id ?? createId("canvas"),
+    type: "canvas",
+    width: 1200,
+    height: 700,
+    items,
+  };
+  return updateNote(
+    note,
+    {
+      blocks: current
+        ? note.blocks.map((block) => (block.id === current.id ? next : block))
+        : [...note.blocks, next],
+    },
+    timestamp,
+  );
 }
 
 export function matchesNote(note: Note, rawQuery: string): boolean {

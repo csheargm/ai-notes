@@ -3,6 +3,7 @@ import {
   matchesNote,
   noteText,
   type InkStroke,
+  type CanvasBlock,
   type Note,
 } from "@ai-notes/notes";
 import {
@@ -27,6 +28,7 @@ import { useNotes } from "./useNotes";
 import { InkCanvas } from "./InkCanvas";
 import { AIPanel } from "./AIPanel";
 import { SyncPanel } from "./SyncPanel";
+import { ResearchPanel } from "./ResearchPanel";
 
 type Filter = "all" | "pinned";
 
@@ -204,6 +206,7 @@ export function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileEditor, setMobileEditor] = useState(false);
   const [syncOpen, setSyncOpen] = useState(false);
+  const [researchOpen, setResearchOpen] = useState(false);
 
   const visibleNotes = useMemo(
     () =>
@@ -276,8 +279,8 @@ export function App() {
             <Pin size={17} /> Pinned{" "}
             <span>{notebook.notes.filter((note) => note.pinned).length}</span>
           </button>
-          <button disabled>
-            <Archive size={17} /> Research <small>Soon</small>
+          <button onClick={() => setResearchOpen(true)}>
+            <Archive size={17} /> Research
           </button>
         </nav>
         <div className="sidebar-footer">
@@ -414,6 +417,24 @@ export function App() {
           onApply={notebook.applySyncChanges}
           onSynced={notebook.markDeletionsSynced}
           onClose={() => setSyncOpen(false)}
+        />
+      )}
+      {researchOpen && selected && (
+        <ResearchPanel
+          note={selected}
+          notes={notebook.notes}
+          onSource={(source) => notebook.createSource(selected, source)}
+          onEditSource={(id, changes) =>
+            notebook.editSource(selected, id, changes)
+          }
+          onLink={(id, label) => notebook.linkNote(selected, id, label)}
+          canvasItems={
+            selected.blocks.find(
+              (block): block is CanvasBlock => block.type === "canvas",
+            )?.items ?? []
+          }
+          onCanvas={(items) => notebook.setCanvas(selected, items)}
+          onClose={() => setResearchOpen(false)}
         />
       )}
     </div>

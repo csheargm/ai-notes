@@ -52,7 +52,7 @@ Status: complete (October 5, 2026)
 
 ## Milestone 5 — Research workspace
 
-Status: in progress
+Status: complete (October 5, 2026)
 
 - URL and quotation capture
 - PDF, image, audio, and document sources
@@ -62,6 +62,8 @@ Status: in progress
 - Spatial canvas
 
 ## Milestone 6 — Agent workflows
+
+Status: in progress
 
 - Trusted Codex and Claude CLI bridges
 - Explicit tool permissions

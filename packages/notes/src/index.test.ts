@@ -8,6 +8,9 @@ import {
   sortNotes,
   updateNoteText,
   updateNoteInk,
+  addSource,
+  addReference,
+  sources,
 } from "./index";
 
 describe("note domain", () => {
@@ -85,5 +88,24 @@ describe("note domain", () => {
     );
     expect(inkBlock(updated)?.strokes[0]?.points[0]?.pressure).toBe(0.7);
     expect(noteText(updated)).toBe("Typed context");
+  });
+
+  it("adds research sources and note references as typed blocks", () => {
+    const note = addReference(
+      addSource(createNote(), {
+        kind: "url",
+        title: "Paper",
+        url: "https://example.com",
+        annotations: [],
+      }),
+      "other",
+      "Related note",
+    );
+    expect(sources(note)[0]?.url).toBe("https://example.com");
+    expect(
+      note.blocks.some(
+        (block) => block.type === "reference" && block.noteId === "other",
+      ),
+    ).toBe(true);
   });
 });

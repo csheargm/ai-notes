@@ -15,6 +15,17 @@ interface NotesDatabase extends DBSchema {
     value: Note;
     indexes: { "by-updated": string };
   };
+  attachments: {
+    key: string;
+    value: {
+      id: string;
+      blob: Blob;
+      name: string;
+      mimeType: string;
+      size: number;
+      createdAt: string;
+    };
+  };
 }
 
 export class IndexedDbNoteRepository implements NoteRepository {
@@ -23,10 +34,14 @@ export class IndexedDbNoteRepository implements NoteRepository {
   constructor(private readonly databaseName = "ai-notes") {}
 
   private db(): Promise<IDBPDatabase<NotesDatabase>> {
-    this.database ??= openDB<NotesDatabase>(this.databaseName, 1, {
-      upgrade(database) {
-        const notes = database.createObjectStore("notes", { keyPath: "id" });
-        notes.createIndex("by-updated", "updatedAt");
+    this.database ??= openDB<NotesDatabase>(this.databaseName, 2, {
+      upgrade(database, oldVersion) {
+        if (oldVersion < 1) {
+          const notes = database.createObjectStore("notes", { keyPath: "id" });
+          notes.createIndex("by-updated", "updatedAt");
+        }
+        if (oldVersion < 2)
+          database.createObjectStore("attachments", { keyPath: "id" });
       },
     });
     return this.database;
@@ -56,5 +71,41 @@ export class IndexedDbNoteRepository implements NoteRepository {
     if (!this.database) return;
     (await this.database).close();
     this.database = undefined;
+  }
+}
+
+export class IndexedDbAttachmentRepository {
+  private database?: Promise<IDBPDatabase<NotesDatabase>>;
+  constructor(private readonly databaseName = "ai-notes") {}
+  private db() {
+    this.database ??= openDB<NotesDatabase>(this.databaseName, 2, {
+      upgrade(database, oldVersion) {
+        if (oldVersion < 1) {
+          const notes = database.createObjectStore("notes", { keyPath: "id" });
+          notes.createIndex("by-updated", "updatedAt");
+        }
+        if (oldVersion < 2)
+          database.createObjectStore("attachments", { keyPath: "id" });
+      },
+    });
+    return this.database;
+  }
+  async save(file: File) {
+    const value = {
+      id: crypto.randomUUID(),
+      blob: file.slice(),
+      name: file.name,
+      mimeType: file.type || "application/octet-stream",
+      size: file.size,
+      createdAt: new Date().toISOString(),
+    };
+    await (await this.db()).put("attachments", value);
+    return value;
+  }
+  async get(id: string) {
+    return (await this.db()).get("attachments", id);
+  }
+  async delete(id: string) {
+    await (await this.db()).delete("attachments", id);
   }
 }
