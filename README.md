@@ -34,6 +34,8 @@ The development server prints its local URL, normally `http://localhost:5173`.
 
 `pnpm dev` starts both the web app and the local API gateway. For local AI, install an Ollama model and set `OLLAMA_MODEL`, or run an OpenAI-compatible MLX server and set `MLX_BASE_URL` and `MLX_MODEL` in `.env`. Ollama is preferred when both local providers are available. For cloud AI, copy `.env.example` to `.env` and set `OPENROUTER_API_KEY`. Secrets remain in the server process and are never bundled into the browser app.
 
+If the default ports are occupied, set matching values such as `AI_NOTES_SERVER_PORT=8791`, `AI_NOTES_WEB_PORT=5174`, and `AI_NOTES_API_URL=http://127.0.0.1:8791` in `.env`.
+
 Available note actions are summarize, explain, rewrite, action items, tag suggestions, and question answering. Routing profiles select Default, Fast, Deep, Local, or the future permissioned Agent path.
 
 To enable synchronization, set a long random `AI_NOTES_SYNC_TOKEN` in `.env`, run the server, then open **Sync notebook** in the app and enter the server URL and token. The browser keeps the token only in session storage. The server persists notes, version history, and attachments below `AI_NOTES_DATA_DIR` (default `.data`). Deploy the server behind HTTPS for use across devices.
