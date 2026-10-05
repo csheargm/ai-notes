@@ -10,6 +10,7 @@ import { loadEnvFile } from "node:process";
 import { AIRouter, type AIRequest } from "@ai-notes/ai";
 import { OllamaProvider, OpenRouterProvider } from "./providers.js";
 import { FileSyncStore } from "./sync-store.js";
+import { AgentService, cliRunner } from "./agent-service.js";
 
 try {
   loadEnvFile();
@@ -21,6 +22,31 @@ const port = Number(process.env.AI_NOTES_SERVER_PORT ?? 8787);
 const dataRoot = process.env.AI_NOTES_DATA_DIR ?? ".data";
 const syncToken = process.env.AI_NOTES_SYNC_TOKEN;
 const syncStore = new FileSyncStore(join(dataRoot, "users"));
+const agentWorkspace = process.env.AI_NOTES_AGENT_WORKSPACE ?? process.cwd();
+const agentRunners = {
+  ...(process.env.AI_NOTES_ENABLE_CODEX === "true"
+    ? {
+        codex: cliRunner(
+          process.env.CODEX_CLI_PATH ?? "codex",
+          ["exec", "--skip-git-repo-check", "-"],
+          agentWorkspace,
+        ),
+      }
+    : {}),
+  ...(process.env.AI_NOTES_ENABLE_CLAUDE === "true"
+    ? {
+        claude: cliRunner(
+          process.env.CLAUDE_CLI_PATH ?? "claude",
+          ["--print", "-"],
+          agentWorkspace,
+        ),
+      }
+    : {}),
+};
+const agentService = new AgentService(
+  agentRunners,
+  join(dataRoot, "audit", "agents.jsonl"),
+);
 const openRouter = new OpenRouterProvider(process.env.OPENROUTER_API_KEY, {
   default: process.env.OPENROUTER_DEFAULT_MODEL,
   fast: process.env.OPENROUTER_FAST_MODEL,
@@ -193,6 +219,48 @@ const server = createServer(async (request, response) => {
         return json(response, 404, { error: "Attachment not found." });
       }
       return;
+    }
+  }
+
+  if (request.method === "GET" && request.url === "/api/agents/config") {
+    const userId = authenticate(request);
+    if (!userId)
+      return json(response, 401, { error: "A valid sync token is required." });
+    return json(response, 200, { providers: Object.keys(agentRunners) });
+  }
+
+  if (request.method === "POST" && request.url === "/api/agents/prepare") {
+    const userId = authenticate(request);
+    if (!userId)
+      return json(response, 401, { error: "A valid sync token is required." });
+    try {
+      return json(
+        response,
+        201,
+        await agentService.prepare(
+          (await body(request)) as import("@ai-notes/agents").AgentRequest,
+        ),
+      );
+    } catch (error) {
+      return json(response, 400, {
+        error:
+          error instanceof Error ? error.message : "Could not prepare agent.",
+      });
+    }
+  }
+
+  const executeMatch = request.url?.match(/^\/api\/agents\/([^/]+)\/execute$/);
+  if (request.method === "POST" && executeMatch) {
+    const userId = authenticate(request);
+    if (!userId)
+      return json(response, 401, { error: "A valid sync token is required." });
+    try {
+      return json(response, 200, await agentService.execute(executeMatch[1]!));
+    } catch (error) {
+      return json(response, 400, {
+        error:
+          error instanceof Error ? error.message : "Could not execute agent.",
+      });
     }
   }
 

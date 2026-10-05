@@ -8,6 +8,7 @@ import {
 } from "@ai-notes/notes";
 import {
   Archive,
+  Bot,
   ChevronLeft,
   Cloud,
   FileText,
@@ -29,6 +30,7 @@ import { InkCanvas } from "./InkCanvas";
 import { AIPanel } from "./AIPanel";
 import { SyncPanel } from "./SyncPanel";
 import { ResearchPanel } from "./ResearchPanel";
+import { AgentPanel } from "./AgentPanel";
 
 type Filter = "all" | "pinned";
 
@@ -77,6 +79,7 @@ function NoteEditor({
   const [tagDraft, setTagDraft] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
+  const [agentOpen, setAgentOpen] = useState(false);
   const titleRef = useRef<HTMLInputElement>(null);
 
   const addTag = () => {
@@ -111,6 +114,13 @@ function NoteEditor({
             onClick={() => setAiOpen((open) => !open)}
           >
             <Sparkles size={16} /> Ask AI
+          </button>
+          <button
+            className="icon-button"
+            aria-label="Open trusted agent"
+            onClick={() => setAgentOpen((open) => !open)}
+          >
+            <Bot size={18} />
           </button>
           <div className="menu-wrap">
             <button
@@ -195,6 +205,9 @@ function NoteEditor({
         <InkCanvas strokes={inkBlock(note)?.strokes ?? []} onChange={onInk} />
       </article>
       {aiOpen && <AIPanel note={note} onClose={() => setAiOpen(false)} />}
+      {agentOpen && (
+        <AgentPanel note={note} onClose={() => setAgentOpen(false)} />
+      )}
     </main>
   );
 }

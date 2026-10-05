@@ -25,6 +25,9 @@ importers:
 
   apps/server:
     dependencies:
+      "@ai-notes/agents":
+        specifier: workspace:*
+        version: link:../../packages/agents
       "@ai-notes/ai":
         specifier: workspace:*
         version: link:../../packages/ai
@@ -41,6 +44,9 @@ importers:
 
   apps/web:
     dependencies:
+      "@ai-notes/agents":
+        specifier: workspace:*
+        version: link:../../packages/agents
       "@ai-notes/ai":
         specifier: workspace:*
         version: link:../../packages/ai
@@ -90,6 +96,8 @@ importers:
       vite-plugin-pwa:
         specifier: ^1.0.3
         version: 1.3.0(vite@7.3.6(@types/node@24.19.1)(terser@5.51.2)(tsx@4.23.15))(workbox-build@7.4.1(@types/babel__core@7.20.5))(workbox-window@7.4.1)
+
+  packages/agents: {}
 
   packages/ai: {}
 

@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@ai-notes/ai": "workspace:*",
+    "@ai-notes/agents": "workspace:*",
     "@ai-notes/notes": "workspace:*",
     "@ai-notes/research": "workspace:*",
     "@ai-notes/storage": "workspace:*",

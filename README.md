@@ -17,6 +17,7 @@ AI Notes is a local-first notebook and knowledge workspace designed for fast wri
 - URL, PDF, image, audio, and file research capture
 - PDF text extraction, image OCR, annotations, links, backlinks, and related notes
 - Draggable spatial research board
+- Permission-reviewed Codex and Claude CLI workflows with audit history
 
 See [requirements](docs/REQUIREMENTS.md), [architecture](docs/ARCHITECTURE.md), and [roadmap](docs/ROADMAP.md) for the product direction and current scope.
 
@@ -37,6 +38,8 @@ Available note actions are summarize, explain, rewrite, action items, tag sugges
 
 To enable synchronization, set a long random `AI_NOTES_SYNC_TOKEN` in `.env`, run the server, then open **Sync notebook** in the app and enter the server URL and token. The browser keeps the token only in session storage. The server persists notes, version history, and attachments below `AI_NOTES_DATA_DIR` (default `.data`). Deploy the server behind HTTPS for use across devices.
 
+Trusted agents are disabled by default. Set `AI_NOTES_ENABLE_CODEX=true` and/or `AI_NOTES_ENABLE_CLAUDE=true`, plus `AI_NOTES_AGENT_WORKSPACE`, only on a machine where those CLIs are already authenticated. The app always shows the prompt preview and requested permissions before the separate **Approve and run** action. Agent output is a proposal and never edits a note automatically; audit events are stored under `.data/audit`.
+
 ## Validation
 
 ```bash
@@ -54,6 +57,7 @@ pnpm build
 - `packages/ai` — provider-neutral AI contracts and routing policy
 - `packages/sync` — change-feed contracts, client, and conflict policy
 - `packages/research` — backlinks and offline related-note ranking
+- `packages/agents` — agent workflow, permission, and execution contracts
 - `packages/shared` — shared primitives
 
 ## Privacy and AI

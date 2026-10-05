@@ -108,6 +108,12 @@ Local discovery builds lightweight term vectors from titles, text, tags, source 
 - Trusted local bridge: optional local models and approved CLI agents.
 - Imported content: untrusted input that requires parsing and rendering controls.
 
+## Trusted agent boundary
+
+Codex CLI and Claude CLI are disabled by default. The server enables each provider only through explicit environment flags and launches only fixed executable/argument combinations with `shell: false` inside a configured trusted workspace. Browser clients cannot submit commands or command-line arguments.
+
+Agent work uses a two-step protocol. Preparation records the workflow, bounded prompt preview, required permissions, expiration, and provider. Execution requires a separate authenticated, single-use approval request. Outputs are proposals and never edit notes automatically. Preparation, completion, and failure events are appended to a private JSONL audit log.
+
 ## Architectural decision record
 
 Significant changes should be captured as short ADRs under `docs/decisions/`. Each record should state context, decision, consequences, and status. Requirements, architecture, and roadmap must be updated when decisions materially alter them.

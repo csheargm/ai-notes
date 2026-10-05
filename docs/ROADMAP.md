@@ -63,7 +63,7 @@ Status: complete (October 5, 2026)
 
 ## Milestone 6 — Agent workflows
 
-Status: in progress
+Status: complete (October 5, 2026)
 
 - Trusted Codex and Claude CLI bridges
 - Explicit tool permissions
