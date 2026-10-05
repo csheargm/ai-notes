@@ -13,6 +13,7 @@
     "@ai-notes/ai": "workspace:*",
     "@ai-notes/notes": "workspace:*",
     "@ai-notes/storage": "workspace:*",
+    "@ai-notes/sync": "workspace:*",
     "lucide-react": "^0.468.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

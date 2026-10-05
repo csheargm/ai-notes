@@ -28,6 +28,12 @@ importers:
       "@ai-notes/ai":
         specifier: workspace:*
         version: link:../../packages/ai
+      "@ai-notes/notes":
+        specifier: workspace:*
+        version: link:../../packages/notes
+      "@ai-notes/sync":
+        specifier: workspace:*
+        version: link:../../packages/sync
     devDependencies:
       tsx:
         specifier: ^4.20.5
@@ -44,6 +50,9 @@ importers:
       "@ai-notes/storage":
         specifier: workspace:*
         version: link:../../packages/storage
+      "@ai-notes/sync":
+        specifier: workspace:*
+        version: link:../../packages/sync
       lucide-react:
         specifier: ^0.468.0
         version: 0.468.0(react@19.3.0)
@@ -91,6 +100,12 @@ importers:
       idb:
         specifier: ^8.0.3
         version: 8.0.3
+
+  packages/sync:
+    dependencies:
+      "@ai-notes/notes":
+        specifier: workspace:*
+        version: link:../notes
 
 packages:
   "@apideck/better-ajv-errors@0.3.7":

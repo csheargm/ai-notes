@@ -41,7 +41,7 @@ Status: complete (October 5, 2026)
 
 ## Milestone 4 — Synchronization
 
-Status: in progress
+Status: complete (October 5, 2026)
 
 - API and authentication
 - Cloud note database and object storage
@@ -51,6 +51,8 @@ Status: in progress
 - Version history and recovery
 
 ## Milestone 5 — Research workspace
+
+Status: in progress
 
 - URL and quotation capture
 - PDF, image, audio, and document sources

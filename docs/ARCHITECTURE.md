@@ -82,18 +82,18 @@ OpenRouter supports Default, Fast, and Deep routing profiles with configurable m
 
 ## Sync direction
 
-A future sync system adds a local change log between repository operations and a remote adapter:
+The sync system adds a local change log between repository operations and a remote adapter:
 
 ```text
 IndexedDB -> change log -> sync engine -> authenticated API
                                       -> database / object storage
 ```
 
-Conflict strategy will be driven by real concurrent-editing requirements. Structured blocks and monotonically increasing local revisions provide migration points without prematurely adopting a CRDT.
+The browser tracks a per-device cursor, last-synced revisions, and pending deletions. The authenticated server maintains a bounded change feed and note history. Revision mismatches are surfaced as conflicts and resolved deterministically by update timestamp and revision while returning both versions for audit. This provides practical multi-device synchronization without prematurely adopting a CRDT.
 
 ## Attachments
 
-Attachment metadata belongs in note blocks; binary data belongs in a separate blob/object store. This avoids bloating note records and permits local blobs to map to cloud objects later.
+Attachment metadata belongs in note blocks; binary data belongs in a separate blob/object store. The server exposes authenticated, size-limited attachment upload/download endpoints and stores binary data separately from notes. A deployed instance can replace the filesystem adapter with object storage without changing note records.
 
 ## Security boundaries
 

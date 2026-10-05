@@ -12,6 +12,8 @@ AI Notes is a local-first notebook and knowledge workspace designed for fast wri
 - IndexedDB persistence with optimistic editing
 - Responsive, installable PWA shell
 - Secure OpenRouter and Ollama note actions through a local server gateway
+- Authenticated multi-device synchronization with change feeds, conflicts, and history
+- Separate authenticated attachment storage
 
 See [requirements](docs/REQUIREMENTS.md), [architecture](docs/ARCHITECTURE.md), and [roadmap](docs/ROADMAP.md) for the product direction and current scope.
 
@@ -30,6 +32,8 @@ The development server prints its local URL, normally `http://localhost:5173`.
 
 Available note actions are summarize, explain, rewrite, action items, tag suggestions, and question answering. Routing profiles select Default, Fast, Deep, Local, or the future permissioned Agent path.
 
+To enable synchronization, set a long random `AI_NOTES_SYNC_TOKEN` in `.env`, run the server, then open **Sync notebook** in the app and enter the server URL and token. The browser keeps the token only in session storage. The server persists notes, version history, and attachments below `AI_NOTES_DATA_DIR` (default `.data`). Deploy the server behind HTTPS for use across devices.
+
 ## Validation
 
 ```bash
@@ -45,6 +49,7 @@ pnpm build
 - `packages/notes` — note domain model and pure behavior
 - `packages/storage` — persistence contracts and IndexedDB adapter
 - `packages/ai` — provider-neutral AI contracts and routing policy
+- `packages/sync` — change-feed contracts, client, and conflict policy
 - `packages/shared` — shared primitives
 
 ## Privacy and AI

@@ -10,7 +10,9 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@ai-notes/ai": "workspace:*"
+    "@ai-notes/ai": "workspace:*",
+    "@ai-notes/notes": "workspace:*",
+    "@ai-notes/sync": "workspace:*"
   },
   "devDependencies": {
     "tsx": "^4.20.5"

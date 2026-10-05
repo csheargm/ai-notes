@@ -8,6 +8,7 @@ import {
   type Note,
 } from "@ai-notes/notes";
 import { IndexedDbNoteRepository } from "@ai-notes/storage";
+import type { SyncChange } from "@ai-notes/sync";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const repository = new IndexedDbNoteRepository();
@@ -22,6 +23,12 @@ export function useNotes() {
   const [selectedId, setSelectedId] = useState<string>();
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
+  const [deletedIds, setDeletedIds] = useState<string[]>(
+    () =>
+      JSON.parse(
+        localStorage.getItem("ai-notes-deleted-ids") ?? "[]",
+      ) as string[],
+  );
   const saveTimers = useRef(new Map<string, ReturnType<typeof setTimeout>>());
   const initialLoad = useRef<Promise<Note[]> | null>(null);
 
@@ -99,12 +106,45 @@ export function useNotes() {
     const timer = saveTimers.current.get(id);
     if (timer) clearTimeout(timer);
     await repository.delete(id);
+    setDeletedIds((current) => {
+      const next = [...new Set([...current, id])];
+      localStorage.setItem("ai-notes-deleted-ids", JSON.stringify(next));
+      return next;
+    });
     setNotes((current) => {
       const remaining = current.filter((note) => note.id !== id);
       setSelectedId((selected) =>
         selected === id ? remaining[0]?.id : selected,
       );
       return remaining;
+    });
+  }, []);
+
+  const applySyncChanges = useCallback(async (changes: SyncChange[]) => {
+    const current = new Map(
+      (await repository.list()).map((note) => [note.id, note]),
+    );
+    for (const change of changes) {
+      if (change.operation === "delete") {
+        current.delete(change.noteId);
+        await repository.delete(change.noteId);
+      } else if (change.note) {
+        current.set(change.note.id, change.note);
+        await repository.save(change.note);
+      }
+    }
+    const next = sortNotes([...current.values()]);
+    setNotes(next);
+    setSelectedId((selected) =>
+      selected && current.has(selected) ? selected : next[0]?.id,
+    );
+  }, []);
+
+  const markDeletionsSynced = useCallback((ids: string[]) => {
+    setDeletedIds((current) => {
+      const next = current.filter((id) => !ids.includes(id));
+      localStorage.setItem("ai-notes-deleted-ids", JSON.stringify(next));
+      return next;
     });
   }, []);
 
@@ -146,5 +186,8 @@ export function useNotes() {
     setTags,
     togglePin,
     setInk,
+    deletedIds,
+    applySyncChanges,
+    markDeletionsSynced,
   };
 }

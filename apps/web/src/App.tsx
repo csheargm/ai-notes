@@ -8,6 +8,7 @@ import {
 import {
   Archive,
   ChevronLeft,
+  Cloud,
   FileText,
   Hash,
   Menu,
@@ -25,6 +26,7 @@ import { useMemo, useRef, useState } from "react";
 import { useNotes } from "./useNotes";
 import { InkCanvas } from "./InkCanvas";
 import { AIPanel } from "./AIPanel";
+import { SyncPanel } from "./SyncPanel";
 
 type Filter = "all" | "pinned";
 
@@ -201,6 +203,7 @@ export function App() {
   const [filter, setFilter] = useState<Filter>("all");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileEditor, setMobileEditor] = useState(false);
+  const [syncOpen, setSyncOpen] = useState(false);
 
   const visibleNotes = useMemo(
     () =>
@@ -278,6 +281,9 @@ export function App() {
           </button>
         </nav>
         <div className="sidebar-footer">
+          <button className="sync-open" onClick={() => setSyncOpen(true)}>
+            <Cloud size={15} /> Sync notebook
+          </button>
           <div className="storage-badge">
             <span /> Local-first
           </div>
@@ -401,6 +407,15 @@ export function App() {
             ? "Couldn’t save"
             : "Saved locally"}
       </div>
+      {syncOpen && (
+        <SyncPanel
+          notes={notebook.notes}
+          deletedIds={notebook.deletedIds}
+          onApply={notebook.applySyncChanges}
+          onSynced={notebook.markDeletionsSynced}
+          onClose={() => setSyncOpen(false)}
+        />
+      )}
     </div>
   );
 }
