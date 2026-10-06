@@ -389,6 +389,22 @@ textarea:focus-visible {
   color: #a3692e;
   background: #f3e7d8;
 }
+.sync-toolbar-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 9px;
+  color: #65716d;
+  background: transparent;
+  cursor: pointer;
+}
+.sync-toolbar-button:hover {
+  color: var(--green);
+  background: var(--green-soft);
+}
 .ai-button {
   display: flex;
   align-items: center;

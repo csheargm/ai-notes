@@ -63,6 +63,7 @@ function NoteEditor({
   onDelete,
   onBack,
   onInk,
+  onSync,
 }: {
   note: Note;
   onTitle: (value: string) => void;
@@ -71,6 +72,7 @@ function NoteEditor({
   onPin: () => void;
   onDelete: () => void;
   onBack: () => void;
+  onSync: () => void;
   onInk: (
     strokes: InkStroke[],
     size: { width: number; height: number },
@@ -102,6 +104,9 @@ function NoteEditor({
           <span className="presence-dot" /> On this device
         </div>
         <div className="toolbar-actions">
+          <button className="sync-toolbar-button" onClick={onSync}>
+            <Cloud size={16} /> Sync
+          </button>
           <button
             className={`icon-button ${note.pinned ? "is-active" : ""}`}
             aria-label={note.pinned ? "Unpin note" : "Pin note"}
@@ -401,6 +406,7 @@ export function App() {
           onPin={() => notebook.togglePin(selected)}
           onDelete={remove}
           onBack={() => setMobileEditor(false)}
+          onSync={() => setSyncOpen(true)}
           onInk={(strokes, size) => notebook.setInk(selected, strokes, size)}
         />
       ) : (
