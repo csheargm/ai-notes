@@ -44,6 +44,8 @@ Trusted agents are disabled by default. Set `AI_NOTES_ENABLE_CODEX=true` and/or 
 
 For private access from other devices, follow the [deployment guide](docs/DEPLOYMENT.md). The recommended personal setup uses Tailscale Serve and keeps Funnel disabled.
 
+The current private configuration can use an Ollama cloud model through the loopback Ollama service while keeping Codex CLI and Claude CLI agent workflows on the Mac. OpenRouter and Supabase are deferred to the future public deployment milestone in the roadmap.
+
 ## Validation
 
 ```bash

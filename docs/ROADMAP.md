@@ -74,3 +74,16 @@ Status: complete (October 5, 2026)
 ## Delivery practice
 
 Each milestone should ship as small reviewable changes, keep the app runnable, add tests for domain behavior, document architectural decisions, and avoid claiming incomplete capabilities.
+
+## Future online deployment
+
+Status: planned
+
+- Deploy the installable web frontend to GitHub Pages, Vercel, or Cloudflare Pages.
+- Replace the shared sync token with Supabase Auth.
+- Move notes, version history, and sync state to Supabase Postgres with Row Level Security.
+- Move attachments to private Supabase Storage.
+- Proxy application-owned OpenRouter calls through an authenticated Supabase Edge Function.
+- Optionally support OpenRouter OAuth PKCE for user-owned API keys.
+- Keep Ollama, Codex CLI, and Claude CLI restricted to the private Tailscale deployment.
+- Add rate limits, backup/export recovery, monitoring, and deployment documentation before public launch.

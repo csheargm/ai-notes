@@ -17,7 +17,7 @@ import { FileSyncStore } from "./sync-store.js";
 import { AgentService, cliRunner } from "./agent-service.js";
 
 try {
-  loadEnvFile();
+  loadEnvFile(new URL("../../../.env", import.meta.url));
 } catch {
   // Environment variables can also be supplied by the shell or deployment host.
 }
